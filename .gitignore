@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# Maven
+target/
+*.class
+*.jar
+*.war
+#
+*.md
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# Frontend
+europay-frontend/node_modules/
+europay-frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
