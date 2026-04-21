@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
+//user entity
 @Entity
 @Table(name = "users")
 @Data
