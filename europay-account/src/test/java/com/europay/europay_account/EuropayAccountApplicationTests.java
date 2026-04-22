@@ -1,0 +1,13 @@
+package com.europay.europay_account;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class EuropayAccountApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
