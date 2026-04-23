@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: europay-audit
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/europay_audit
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: audit-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.europay.events"
+
+server:
+  port: 8084
