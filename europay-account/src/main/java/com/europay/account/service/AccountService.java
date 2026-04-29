@@ -23,6 +23,10 @@ public class AccountService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
     public AccountResponse createAccount(String userId, CreateAccountRequest request) {
+        if (accountRepository.existsByUserIdAndType(userId, request.type())) {
+            throw new IllegalArgumentException("Vous possédez déjà un compte " + request.type());
+        }
+
         Account account = Account.builder()
                 .userId(userId)
                 .iban(generateIban())

@@ -2,5 +2,5 @@ package com.europay.account.entity;
 
 public enum AccountType {
     COURANT,
-    PROFESSIONNEL
+    LIVRET_A
 }
