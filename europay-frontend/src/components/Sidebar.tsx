@@ -1,15 +1,16 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ArrowLeftRight, LogOut, CreditCard } from 'lucide-react'
+import { LayoutDashboard, ArrowLeftRight, LogOut, CreditCard, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
-const navItems = [
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Comptes' },
-  { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
-]
-
 export default function Sidebar() {
-  const { logout } = useAuth()
+  const { logout, isAdmin } = useAuth()
   const navigate = useNavigate()
+
+  const navItems = [
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Comptes' },
+    { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
+    ...(isAdmin ? [{ to: '/admin', icon: ShieldCheck, label: 'Admin' }] : []),
+  ]
 
   const handleLogout = () => {
     logout()

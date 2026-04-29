@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import CreateAccount from './pages/CreateAccount'
 import Transactions from './pages/Transactions'
 import CreateTransaction from './pages/CreateTransaction'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/accounts/new" element={<ProtectedRoute><CreateAccount /></ProtectedRoute>} />
           <Route path="/transactions" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
           <Route path="/transactions/new" element={<ProtectedRoute><CreateTransaction /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>

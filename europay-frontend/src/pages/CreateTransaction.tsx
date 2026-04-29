@@ -111,7 +111,7 @@ export default function CreateTransaction() {
                 <option value="">Sélectionner un compte</option>
                 {accounts.map((a) => (
                   <option key={a.id} value={a.id}>
-                    {a.type === 'COURANT' ? 'Courant' : 'Livret A'} — {fmt(a.balance)}
+                    {a.type === 'COURANT' ? 'Compte Courant' : 'Livret A'} ({fmt(a.balance)})
                   </option>
                 ))}
               </select>
@@ -134,7 +134,7 @@ export default function CreateTransaction() {
                   <option value="">Sélectionner un compte</option>
                   {accounts.map((a) => (
                     <option key={a.id} value={a.id}>
-                      {a.type === 'COURANT' ? 'Courant' : 'Professionnel'} — {a.iban.slice(-8)}
+                      {a.type === 'COURANT' ? 'Compte Courant' : 'Livret A'} ({fmt(a.balance)})
                     </option>
                   ))}
                 </select>
