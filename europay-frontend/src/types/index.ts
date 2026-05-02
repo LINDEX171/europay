@@ -3,6 +3,8 @@ export interface AuthResponse {
   userId: string
   email: string
   role: string
+  firstName: string
+  lastName: string
 }
 
 export interface Account {

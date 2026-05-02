@@ -15,9 +15,9 @@ const typeConfig = {
   DEPOT: {
     label: 'Dépôt',
     icon: ArrowDownLeft,
-    iconBg: 'bg-emerald-50',
-    iconColor: 'text-emerald-600',
-    amountColor: 'text-emerald-600',
+    iconBg: 'bg-[#E6FAF5]',
+    iconColor: 'text-[#0DAF87]',
+    amountColor: 'text-[#0DAF87]',
     sign: '+',
   },
   RETRAIT: {
@@ -31,8 +31,8 @@ const typeConfig = {
   VIREMENT: {
     label: 'Virement',
     icon: ArrowLeftRight,
-    iconBg: 'bg-blue-50',
-    iconColor: 'text-blue-600',
+    iconBg: 'bg-slate-100',
+    iconColor: 'text-slate-600',
     amountColor: 'text-slate-900',
     sign: '-',
   },
@@ -41,7 +41,7 @@ const typeConfig = {
 const statusConfig = {
   INITIATED: { label: 'Initié', class: 'bg-amber-50 text-amber-600' },
   VALIDATED: { label: 'Validé', class: 'bg-blue-50 text-blue-600' },
-  COMPLETED: { label: 'Complété', class: 'bg-emerald-50 text-emerald-600' },
+  COMPLETED: { label: 'Complété', class: 'bg-[#E6FAF5] text-[#0DAF87]' },
   FAILED: { label: 'Échoué', class: 'bg-red-50 text-red-500' },
 }
 
@@ -59,16 +59,16 @@ export default function Transactions() {
 
   return (
     <Layout>
-      <div className="px-8 py-8 max-w-4xl">
+      <div className="px-4 py-6 sm:px-8 sm:py-8 max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Transactions</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Historique de vos opérations</p>
+            <p className="text-slate-400 text-sm mt-0.5">Historique de vos opérations</p>
           </div>
           <Link
             to="/transactions/new"
-            className="flex items-center gap-2 bg-[#1B3A6B] hover:bg-[#162f58] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all"
+            className="flex items-center gap-2 bg-[#0DAF87] hover:bg-[#0C9E79] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-all"
           >
             <Plus size={16} />
             Nouvelle transaction
@@ -77,7 +77,7 @@ export default function Transactions() {
 
         {loading && (
           <div className="flex items-center gap-2 text-slate-400 text-sm">
-            <div className="w-4 h-4 border-2 border-slate-200 border-t-[#1B3A6B] rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-slate-200 border-t-[#0DAF87] rounded-full animate-spin" />
             Chargement...
           </div>
         )}
@@ -86,14 +86,14 @@ export default function Transactions() {
 
         {!loading && !error && transactions.length === 0 && (
           <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4">
-              <Receipt size={22} className="text-slate-300" />
+            <div className="w-12 h-12 rounded-2xl bg-[#E6FAF5] flex items-center justify-center mx-auto mb-4">
+              <Receipt size={22} className="text-[#0DAF87]" />
             </div>
             <p className="text-slate-600 font-medium mb-1">Aucune transaction</p>
             <p className="text-slate-400 text-sm mb-5">Vos opérations apparaîtront ici</p>
             <Link
               to="/transactions/new"
-              className="inline-flex items-center gap-2 bg-[#1B3A6B] text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-[#162f58] transition-all"
+              className="inline-flex items-center gap-2 bg-[#0DAF87] hover:bg-[#0C9E79] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all"
             >
               <Plus size={15} />
               Première transaction
@@ -102,7 +102,7 @@ export default function Transactions() {
         )}
 
         {transactions.length > 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-slate-100 overflow-x-auto">
             {transactions.map((tx, i) => {
               const config = typeConfig[tx.type]
               const status = statusConfig[tx.status]
@@ -112,12 +112,10 @@ export default function Transactions() {
                   key={tx.id}
                   className={`flex items-center gap-4 px-6 py-4 ${i !== 0 ? 'border-t border-slate-50' : ''}`}
                 >
-                  {/* Icon */}
                   <div className={`w-10 h-10 rounded-xl ${config.iconBg} flex items-center justify-center flex-shrink-0`}>
                     <Icon size={18} className={config.iconColor} />
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-slate-900">{config.label}</p>
                     <p className="text-xs text-slate-400 truncate">
@@ -127,12 +125,10 @@ export default function Transactions() {
                     </p>
                   </div>
 
-                  {/* Status */}
                   <span className={`text-xs font-medium px-2.5 py-1 rounded-lg ${status.class}`}>
                     {status.label}
                   </span>
 
-                  {/* Amount */}
                   <p className={`text-sm font-bold tabular-nums ${config.amountColor} min-w-24 text-right`}>
                     {config.sign}{fmt(tx.amount)}
                   </p>

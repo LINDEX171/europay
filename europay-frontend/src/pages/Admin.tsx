@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Users, CreditCard, ArrowLeftRight, ShieldCheck, Ban, CheckCircle, AlertCircle } from 'lucide-react'
-import { getAdminUsers, getAdminAccounts, getAdminTransactions, patchAccountStatus } from '../api/admin'
+import { Users, CreditCard, ArrowLeftRight, ShieldCheck, Ban, CheckCircle, AlertCircle, UserX, UserCheck } from 'lucide-react'
+import { getAdminUsers, getAdminAccounts, getAdminTransactions, patchAccountStatus, patchUser } from '../api/admin'
 import type { AdminUser } from '../api/admin'
 import type { Account, Transaction } from '../types'
 import { useAuth } from '../context/AuthContext'
@@ -16,15 +16,15 @@ const fmtDate = (s: string) =>
   new Date(s).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })
 
 const statusColors: Record<string, string> = {
-  ACTIVE: 'bg-emerald-50 text-emerald-700',
+  ACTIVE: 'bg-[#E6FAF5] text-[#0DAF87]',
   INACTIVE: 'bg-slate-100 text-slate-500',
   BLOCKED: 'bg-red-50 text-red-600',
-  COMPLETED: 'bg-emerald-50 text-emerald-700',
+  COMPLETED: 'bg-[#E6FAF5] text-[#0DAF87]',
   VALIDATED: 'bg-blue-50 text-blue-600',
   INITIATED: 'bg-amber-50 text-amber-600',
   FAILED: 'bg-red-50 text-red-500',
   ROLE_ADMIN: 'bg-purple-50 text-purple-700',
-  ROLE_USER: 'bg-slate-50 text-slate-600',
+  ROLE_USER: 'bg-slate-100 text-slate-600',
 }
 
 export default function Admin() {
@@ -57,6 +57,11 @@ export default function Admin() {
     setAccounts((prev) => prev.map((a) => (a.id === acc.id ? res.data : a)))
   }
 
+  const toggleEnabled = async (u: AdminUser) => {
+    const res = await patchUser(u.id, { enabled: !u.enabled })
+    setUsers((prev) => prev.map((x) => (x.id === u.id ? res.data : x)))
+  }
+
   const tabs: { key: Tab; label: string; icon: React.ElementType }[] = [
     { key: 'users', label: 'Utilisateurs', icon: Users },
     { key: 'accounts', label: 'Comptes', icon: CreditCard },
@@ -65,15 +70,15 @@ export default function Admin() {
 
   return (
     <Layout>
-      <div className="px-8 py-8 max-w-6xl">
+      <div className="px-4 py-6 sm:px-8 sm:py-8 max-w-6xl overflow-x-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center">
-            <ShieldCheck size={18} className="text-purple-600" />
+          <div className="w-9 h-9 rounded-xl bg-[#E6FAF5] flex items-center justify-center">
+            <ShieldCheck size={18} className="text-[#0DAF87]" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900">Administration</h1>
-            <p className="text-slate-500 text-sm">Vue globale du système</p>
+            <p className="text-slate-400 text-sm">Vue globale du système</p>
           </div>
         </div>
 
@@ -84,7 +89,9 @@ export default function Admin() {
               key={key}
               onClick={() => setTab(key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                tab === key ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'
+                tab === key
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               <Icon size={15} />
@@ -95,7 +102,7 @@ export default function Admin() {
 
         {loading && (
           <div className="flex items-center gap-2 text-slate-400 text-sm">
-            <div className="w-4 h-4 border-2 border-slate-200 border-t-[#1B3A6B] rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-slate-200 border-t-[#0DAF87] rounded-full animate-spin" />
             Chargement...
           </div>
         )}
@@ -112,11 +119,13 @@ export default function Admin() {
           <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-50 bg-slate-50/50">
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Nom</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Email</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Rôle</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Inscription</th>
+                <tr className="border-b border-slate-50 bg-slate-50/60">
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Nom</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Email</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Rôle</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Statut</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Inscription</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -129,7 +138,24 @@ export default function Admin() {
                         {u.role === 'ROLE_ADMIN' ? 'Admin' : 'Utilisateur'}
                       </span>
                     </td>
+                    <td className="px-5 py-3.5">
+                      <span className={`text-xs font-medium px-2 py-1 rounded-lg ${u.enabled ? 'bg-[#E6FAF5] text-[#0DAF87]' : 'bg-red-50 text-red-600'}`}>
+                        {u.enabled ? 'Actif' : 'Désactivé'}
+                      </span>
+                    </td>
                     <td className="px-5 py-3.5 text-slate-400">{fmtDate(u.createdAt)}</td>
+                    <td className="px-5 py-3.5">
+                      <button
+                        onClick={() => toggleEnabled(u)}
+                        className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${
+                          u.enabled
+                            ? 'bg-red-50 text-red-600 hover:bg-red-100'
+                            : 'bg-[#E6FAF5] text-[#0DAF87] hover:bg-[#d0f5ea]'
+                        }`}
+                      >
+                        {u.enabled ? <><UserX size={13} /> Désactiver</> : <><UserCheck size={13} /> Activer</>}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -142,12 +168,12 @@ export default function Admin() {
           <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-50 bg-slate-50/50">
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Type</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">IBAN</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Solde</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Statut</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Action</th>
+                <tr className="border-b border-slate-50 bg-slate-50/60">
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Type</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">IBAN</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Solde</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Statut</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,7 +194,7 @@ export default function Admin() {
                         onClick={() => toggleStatus(a)}
                         className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${
                           a.status === 'BLOCKED'
-                            ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                            ? 'bg-[#E6FAF5] text-[#0DAF87] hover:bg-[#d0f5ea]'
                             : 'bg-red-50 text-red-600 hover:bg-red-100'
                         }`}
                       >
@@ -189,12 +215,12 @@ export default function Admin() {
           <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-50 bg-slate-50/50">
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Type</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Montant</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Description</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Statut</th>
-                  <th className="text-left px-5 py-3 font-medium text-slate-500">Date</th>
+                <tr className="border-b border-slate-50 bg-slate-50/60">
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Type</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Montant</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Description</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Statut</th>
+                  <th className="text-left px-5 py-3.5 font-medium text-slate-500">Date</th>
                 </tr>
               </thead>
               <tbody>
